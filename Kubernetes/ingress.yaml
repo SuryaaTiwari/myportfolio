@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myportfolio-ingress
+  namespace: mynamespace
+spec:
+  rules:
+    - host: "surya.prakashsolanki.tech"  # Your CNAME domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: myportfolio  # Name of the service to route traffic to
+                port:
+                  number: 80

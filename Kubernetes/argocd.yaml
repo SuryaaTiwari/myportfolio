@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myportfolio-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/Ashfaque-9x/register-app'  # Your GitHub repo URL
+    targetRevision: main  # The branch to deploy from
+    path: Kubernetes/  # Path where your Kubernetes YAML files are in the repo
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: mynamespace  # Your application namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

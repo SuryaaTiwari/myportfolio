@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myportfolio
+  namespace: mynamespace
+spec:
+  selector:
+    matchLabels:
+      app: myportfolio
+  template:
+    metadata:
+      labels:
+        app: myportfolio
+    spec:
+      serviceAccountName: myportfolioservice
+      containers:
+      - name: myapp
+        image: <Image>
+        ports:
+         - name: myport
+           containerPort: 8080
+
+
+
