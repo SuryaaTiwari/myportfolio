@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'Jenkins-Agent' }
+    agent any
 
     tools {
         jdk 'Java17'
@@ -7,13 +7,14 @@ pipeline {
     }
 
     environment {
-        APP_NAME = "register-app-pipeline"
+        APP_NAME = "My-portfolio"
         RELEASE = "1.0.0"
-        DOCKER_USER = "ashfaque9x"
-        DOCKER_PASS = 'dockerhub'
+        DOCKER_USER = "suryaprakashtiwarirj"
+        DOCKER_PASS = credentials("docker-hub-credentials")  // Docker Hub credentials ID
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+        GIT_USER = credentials('github-username')  // GitHub credentials ID for pushing changes
+        GIT_PASS = credentials('github-token')    // GitHub token credentials ID
     }
 
     stages {
@@ -59,10 +60,16 @@ pipeline {
             }
         }
 
+        stage("Trivy File Scan") {
+            steps {
+                sh "trivy fs . > trivy.txt"
+            }
+        }
+
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('', DOCKER_PASS) {
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
                         docker_image = docker.build "${IMAGE_NAME}"
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push("latest")
@@ -71,14 +78,19 @@ pipeline {
             }
         }
 
-        stage("Trivy Scan") {
+        stage("Docker Scout Image") {
             steps {
-                sh """
-                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-                    aquasec/trivy image ${IMAGE_NAME}:${IMAGE_TAG} \
-                    --no-progress --scanners vuln \
-                    --exit-code 0 --severity HIGH,CRITICAL --format table
-                """
+                script {
+                    // Run docker-scout inside a Docker container to scan the image
+                    docker.image('docker:latest').inside {
+                        // Authenticate to Docker Hub and scan the image with docker-scout
+                        sh 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}'  // Login to Docker Hub
+                        sh 'docker pull ${IMAGE_NAME}:${IMAGE_TAG}'  // Pull the image from Docker Hub
+                        sh 'docker-scout quickview ${IMAGE_NAME}:${IMAGE_TAG}'  // Run quickview scan
+                        sh 'docker-scout cves ${IMAGE_NAME}:${IMAGE_TAG}'  // Scan for CVEs (vulnerabilities)
+                        sh 'docker-scout recommendations ${IMAGE_NAME}:${IMAGE_TAG}'  // Get recommendations for the image
+                    }
+                }
             }
         }
 
@@ -91,7 +103,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' kubernetes/deployment.yaml
                         git add kubernetes/deployment.yaml
                         git commit -m "Update image to ${IMAGE_NAME}:${IMAGE_TAG} from Jenkins"
-                        git push https://$GIT_USER:$GIT_PASS@github.com/Ashfaque-9x/register-app.git main
+                        git push https://${GIT_USER}:${GIT_PASS}@github.com/Ashfaque-9x/register-app.git main
                     """
                 }
             }
@@ -101,20 +113,6 @@ pipeline {
             steps {
                 sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
                 sh "docker rmi ${IMAGE_NAME}:latest || true"
-            }
-        }
-
-        stage("Trigger CD Job (Optional)") {
-            steps {
-                script {
-                    sh """
-                        curl -v -k --user clouduser:${JENKINS_API_TOKEN} -X POST \
-                        -H 'cache-control: no-cache' \
-                        -H 'content-type: application/x-www-form-urlencoded' \
-                        --data 'IMAGE_TAG=${IMAGE_TAG}' \
-                        'http://<JENKINS_URL>/job/gitops-register-app-cd/buildWithParameters?token=gitops-token'
-                    """
-                }
             }
         }
     }
