@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        APP_NAME = "My-portfolio"
+        APP_NAME = "my-portfolio"
         RELEASE = "1.0.0"
         DOCKER_USER = "suryaprakashtiwarirj"
         DOCKER_PASS = credentials("docker-hub-credentials")  // Docker Hub credentials ID
