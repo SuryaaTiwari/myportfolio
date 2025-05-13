@@ -101,19 +101,14 @@ pipeline {
             }
         }
 
-  stage("Docker Scout Image") {
+stage("Docker Scout Image") {
     steps {
         script {
             // Run docker-scout inside a Docker container to scan the image
             docker.image('docker:latest').inside {
-                // Authenticate to Docker Hub securely using --password-stdin
-                sh '''
-                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                '''
-
                 // Pull the image from Docker Hub
                 sh 'docker pull ${IMAGE_NAME}:${IMAGE_TAG}'  // Pull the image from Docker Hub
-                
+
                 // Run docker-scout to scan the image
                 sh 'docker-scout quickview ${IMAGE_NAME}:${IMAGE_TAG}'  // Quick view scan
                 sh 'docker-scout cves ${IMAGE_NAME}:${IMAGE_TAG}'  // Scan for CVEs (vulnerabilities)
@@ -122,6 +117,7 @@ pipeline {
         }
     }
 }
+
 
         stage("Update GitOps Manifests") {
             steps {
