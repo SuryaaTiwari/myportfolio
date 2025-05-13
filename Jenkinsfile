@@ -69,7 +69,7 @@ pipeline {
                     // Use the SonarQube Scanner installed in Jenkins
                     withSonarQubeEnv('sonarserver') {
                         // Run the sonar-scanner with proper arguments
-                        sh '''${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=myportfolio \
+                        sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectName=myportfolio \
                     -Dsonar.projectKey=myportfolio '''
                 }
             }
