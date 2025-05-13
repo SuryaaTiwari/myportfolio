@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                        sh "npm run jenkins-sonarqube-token"
+                        sh "sonar-scanner"
                     }
                 }
             }
