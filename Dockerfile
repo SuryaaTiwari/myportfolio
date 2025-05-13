@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY vite.config.ts ./
+COPY index.html ./ 
 COPY ./src ./src
 COPY ./public ./public
 
