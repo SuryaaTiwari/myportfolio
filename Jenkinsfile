@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                        sh "npm run sonar"
+                        sh "npm run jenkins-sonarqube-token"
                     }
                 }
             }
@@ -119,7 +119,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' kubernetes/deployment.yaml
                         git add kubernetes/deployment.yaml
                         git commit -m "Update image to ${IMAGE_NAME}:${IMAGE_TAG} from Jenkins"
-                        git push https://${GIT_USER}:${GIT_PASS}@github.com/Ashfaque-9x/register-app.git main
+                        git push https://${GIT_USER}:${GIT_PASS}@https://github.com/SuryaaTiwari/myportfolio.git master
                     """
                 }
             }
