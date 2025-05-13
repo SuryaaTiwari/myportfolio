@@ -5,6 +5,7 @@ pipeline {
         jdk 'Java17'         // If you are using JDK for any Java-related tasks
         maven 'Maven3'       // If you still need Maven for any other tasks
         nodejs 'NodeJS'      // NodeJS tool configured in Jenkins
+        sonar  'sonar-scanner'
     }
 
     environment {
@@ -61,8 +62,13 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                        sh "sonar-scanner"
+                    // Make sure SonarQube is correctly configured in Jenkins
+                    withSonarQubeEnv('jenkins-sonarqube-token') {
+                        // Run the sonar-scanner with proper arguments
+                        sh '''sonar-scanner \
+                            -Dsonar.projectName=myportfolio \
+                            -Dsonar.projectKey=myportfolio \
+                            -Dsonar.host.url=http://http://51.20.251.129:9000''' // Replace with your SonarQube URL
                     }
                 }
             }
