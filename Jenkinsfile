@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     tools {
-        jdk 'Java17'
-        maven 'Maven3'
+        jdk 'Java17'         // If you are using JDK for any Java-related tasks
+        maven 'Maven3'       // If you still need Maven for any other tasks
+        nodejs 'NodeJS'      // NodeJS tool configured in Jenkins
     }
 
     environment {
@@ -26,19 +27,34 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                git branch: 'master',credentialsId: 'github', url: 'https://github.com/SuryaaTiwari/myportfolio.git'
+                git branch: 'master', credentialsId: 'github', url: 'https://github.com/SuryaaTiwari/myportfolio.git'
+            }
+        }
+
+        stage("Install Dependencies") {
+            steps {
+                script {
+                    // Install npm dependencies
+                    sh "npm install"
+                }
             }
         }
 
         stage("Build Application") {
             steps {
-                sh "mvn clean package"
+                script {
+                    // Run your build command, like `npm run build` if you have it in package.json
+                    sh "npm run build"
+                }
             }
         }
 
         stage("Test Application") {
             steps {
-                sh "mvn test"
+                script {
+                    // Run tests using npm (assuming `npm test` is configured)
+                    sh "npm test"
+                }
             }
         }
 
@@ -46,7 +62,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                        sh "mvn sonar:sonar"
+                        sh "npm run sonar"
                     }
                 }
             }
