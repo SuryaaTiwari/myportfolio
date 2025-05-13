@@ -16,7 +16,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         GIT_USER = credentials('github-username')  // GitHub credentials ID for pushing changes
         GIT_PASS = credentials('github-token')    // GitHub token credentials ID
-         SCANNER_HOME=tool 'sonar-scanner'
+        
     }
 
     stages {
@@ -60,12 +60,16 @@ pipeline {
         }
 
         stage("SonarQube Analysis") {
+            environment {
+                scannerHome = tool 'sonar6.2.1'
+            }
+
             steps {
                 script {
                     // Use the SonarQube Scanner installed in Jenkins
-                    withSonarQubeEnv('sonar-scanner') {
+                    withSonarQubeEnv('sonar') {
                         // Run the sonar-scanner with proper arguments
-                        sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=myportfolio \
+                        sh '''${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=myportfolio \
                     -Dsonar.projectKey=myportfolio '''
                 }
             }
