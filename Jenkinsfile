@@ -81,7 +81,12 @@ pipeline {
             }
         }
 
-       
+        stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit -n', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
 
         stage("Trivy File Scan") {
             steps {
@@ -101,11 +106,13 @@ pipeline {
             }
         }
 
-stage("Docker Scout Image") {
-    steps {
-        script {
-            // Run docker-scout inside a Docker container to scan the image
-            docker.image('docker:latest').inside {
+        /*
+       
+        stage("Docker Scout Image") {
+            steps {
+                script {
+              // Run docker-scout inside a Docker container to scan the image
+              docker.image('docker:latest').inside {
                 // Pull the image from Docker Hub
                 sh 'docker pull ${IMAGE_NAME}:${IMAGE_TAG}'  // Pull the image from Docker Hub
 
@@ -113,11 +120,11 @@ stage("Docker Scout Image") {
                 sh 'docker-scout quickview ${IMAGE_NAME}:${IMAGE_TAG}'  // Quick view scan
                 sh 'docker-scout cves ${IMAGE_NAME}:${IMAGE_TAG}'  // Scan for CVEs (vulnerabilities)
                 sh 'docker-scout recommendations ${IMAGE_NAME}:${IMAGE_TAG}'  // Get recommendations for the image
+                    }
+                  }
+                }
             }
-        }
-    }
-}
-
+            */
 
         stage("Update GitOps Manifests") {
             steps {
