@@ -6,8 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/Ashfaque-9x/register-app'  # Your GitHub repo URL
-    targetRevision: main  # The branch to deploy from
+    repoURL: 'https://github.com/SuryaaTiwari/myportfolio.git'  # Your GitHub repo URL
+    targetRevision: master  # The branch to deploy from
     path: Kubernetes/  # Path where your Kubernetes YAML files are in the repo
   destination:
     server: 'https://kubernetes.default.svc'

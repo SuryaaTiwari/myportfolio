@@ -31,7 +31,29 @@ pipeline {
                 git branch: 'master', credentialsId: 'github', url: 'https://github.com/SuryaaTiwari/myportfolio.git'
             }
         }
+         stage("SonarQube Analysis") {
+            environment {
+                scannerHome = tool 'sonar6.2.1'
+            }
+            steps {
+                script {
+                    // Use the SonarQube Scanner installed in Jenkins
+                    withSonarQubeEnv('sonarserver') {
+                        // Run the sonar-scanner with proper arguments
+                        sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectName=myportfolio \
+                    -Dsonar.projectKey=myportfolio '''
+                }
+            }
+        }
+        }
 
+        stage("Quality Gate") {
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
+                }
+            }
+        }
         stage("Install Dependencies") {
             steps {
                 script {
@@ -59,29 +81,7 @@ pipeline {
             }
         }
 
-        stage("SonarQube Analysis") {
-            environment {
-                scannerHome = tool 'sonar6.2.1'
-            }
-
-            steps {
-                script {
-                    // Use the SonarQube Scanner installed in Jenkins
-                    withSonarQubeEnv('sonarserver') {
-                        // Run the sonar-scanner with proper arguments
-                        sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectName=myportfolio \
-                    -Dsonar.projectKey=myportfolio '''
-                }
-            }
-        }
-        }
-       // stage("Quality Gate") {
-         //   steps {
-           //     script {
-             //       waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-               // }
-          //  }
-      //  }
+       
 
         stage("Trivy File Scan") {
             steps {

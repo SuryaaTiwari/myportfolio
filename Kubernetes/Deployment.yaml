@@ -15,7 +15,8 @@ spec:
       serviceAccountName: myportfolioservice
       containers:
       - name: myapp
-        image: <Image>
+        image: suryaprakashtiwarirj/my-portfolio:latest
+
         ports:
          - name: myport
            containerPort: 8080
