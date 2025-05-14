@@ -123,23 +123,24 @@ pipeline {
                     }
                   }
                 }
-            }
+        }
             */
 
         stage("Update GitOps Manifests") {
-            steps {
-                script {
-                    sh """
-                        git config user.email "ci@jenkins"
-                        git config user.name "Jenkins"
-                        sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' kubernetes/deployment.yaml
-                        git add kubernetes/deployment.yaml
-                        git commit -m "Update image to ${IMAGE_NAME}:${IMAGE_TAG} from Jenkins"
-                        git push https://${GIT_USER}:${GIT_PASS}@https://github.com/SuryaaTiwari/myportfolio.git master
-                    """
-                }
+          steps {
+            script {
+            sh """
+                git config user.email "ci@jenkins"
+                git config user.name "Jenkins"
+                sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' kubernetes/deployment.yaml
+                git add kubernetes/deployment.yaml
+                git commit -m "Update image to ${IMAGE_NAME}:${IMAGE_TAG} from Jenkins"
+                git push https://${GIT_USER}:${GIT_PASS}@github.com/SuryaaTiwari/myportfolio.git master  
+                """
             }
+          }
         }
+
 
         stage("Cleanup Artifacts") {
             steps {
