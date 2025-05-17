@@ -16,17 +16,13 @@ spec:
       containers:
       - name: myapp
         image: suryaprakashtiwarirj/my-portfolio:latest
-
         ports:
-         - name: myport
-           containerPort: 8080
-
+          - name: myport
+            containerPort: 8080
         resources:
-           requests:
-           memory: "256Mi"
-           cpu: "500m"
-        limits:
-           memory: "512Mi"
-           cpu: "1"
-
-
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
