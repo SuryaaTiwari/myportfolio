@@ -7,6 +7,7 @@ spec:
   selector:
     app: myportfolio
   ports:
-  - port: 80           
-    targetPort: myport  
+  - protocol: TCP
+    port: 80           
+    targetPort: 80 
   type: LoadBalancer
